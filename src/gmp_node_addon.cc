@@ -1,25 +1,24 @@
-#include "gmp_node_addon.h"
+#define RETURN_VALUE(info, value) info.GetReturnValue().Set(value)
 
-void Gmp_Node::Initialize(v8::Handle<v8::Object> target) {
-    Nan::SetMethod(target, "mpf_add", MPF_Add);
-    Nan::SetMethod(target, "mpf_sub", MPF_Sub);
-    Nan::SetMethod(target, "mpf_mul", MPF_Mul);
-    Nan::SetMethod(target, "mpf_div", MPF_Div);
-    Nan::SetMethod(target, "mpf_sqrt", MPF_Sqrt);
-    Nan::SetMethod(target, "mpf_pow_ui", MPF_Pow_ui);
-    Nan::SetMethod(target, "mpf_neg", MPF_Neg);
-    Nan::SetMethod(target, "mpf_abs", MPF_Abs);
-}
+#define LOCAL_STRING(str) Nan::New<String>(str).ToLocalChecked()
 
-NAN_METHOD(Gmp_Node::MPF_Add) {
+#define THROW_IF_NOT(condition, text) if (!(condition)) { return Nan::ThrowError(text); }
+
+#include <gmp.h>
+#include <nan.h>
+#include <v8.h>
+
+void MPF_Add(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 2, "argument must be two");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
     THROW_IF_NOT(info[1]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0, arg_1;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
-    mpf_init_set_d(arg_1, info[1]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
+    mpf_init_set_d(arg_1, info[1]->NumberValue(context).FromJust());
     mpf_add(sum, arg_0, arg_1);
 
     double result = mpf_get_d(sum);
@@ -31,15 +30,17 @@ NAN_METHOD(Gmp_Node::MPF_Add) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Sub) {
+void MPF_Sub(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 2, "argument must be two");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
     THROW_IF_NOT(info[1]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0, arg_1;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
-    mpf_init_set_d(arg_1, info[1]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
+    mpf_init_set_d(arg_1, info[1]->NumberValue(context).FromJust());
     mpf_sub(sum, arg_0, arg_1);
 
     double result = mpf_get_d(sum);
@@ -51,15 +52,17 @@ NAN_METHOD(Gmp_Node::MPF_Sub) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Mul) {
+void MPF_Mul(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 2, "argument must be two");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
     THROW_IF_NOT(info[1]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0, arg_1;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
-    mpf_init_set_d(arg_1, info[1]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
+    mpf_init_set_d(arg_1, info[1]->NumberValue(context).FromJust());
     mpf_mul(sum, arg_0, arg_1);
 
     double result = mpf_get_d(sum);
@@ -71,15 +74,17 @@ NAN_METHOD(Gmp_Node::MPF_Mul) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Div) {
+void MPF_Div(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 2, "argument must be two");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
     THROW_IF_NOT(info[1]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0, arg_1;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
-    mpf_init_set_d(arg_1, info[1]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
+    mpf_init_set_d(arg_1, info[1]->NumberValue(context).FromJust());
     mpf_div(sum, arg_0, arg_1);
 
     double result = mpf_get_d(sum);
@@ -91,13 +96,15 @@ NAN_METHOD(Gmp_Node::MPF_Div) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Sqrt) {
+void MPF_Sqrt(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 1, "argument must be one");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
     mpf_sqrt(sum, arg_0);
 
     double result = mpf_get_d(sum);
@@ -108,15 +115,17 @@ NAN_METHOD(Gmp_Node::MPF_Sqrt) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Pow_ui) {
+void MPF_Pow_ui(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 2, "argument must be two");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
     THROW_IF_NOT(info[1]->IsUint32(), "argument must be an unsigned integer");
 
     mpf_t sum, arg_0;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
-    mpf_pow_ui(sum, arg_0, info[1]->Uint32Value());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
+    mpf_pow_ui(sum, arg_0, info[1]->Uint32Value(context).FromJust());
 
     double result = mpf_get_d(sum);
 
@@ -126,13 +135,15 @@ NAN_METHOD(Gmp_Node::MPF_Pow_ui) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Abs) {
+void MPF_Abs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 1, "argument must be one");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
     mpf_abs(sum, arg_0);
 
     double result = mpf_get_d(sum);
@@ -143,13 +154,15 @@ NAN_METHOD(Gmp_Node::MPF_Abs) {
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Gmp_Node::MPF_Neg) {
+void MPF_Neg(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
     THROW_IF_NOT(info.Length() >= 1, "argument must be one");
     THROW_IF_NOT(info[0]->IsNumber(), "argument must be an number");
 
     mpf_t sum, arg_0;
     mpf_init(sum);
-    mpf_init_set_d(arg_0, info[0]->NumberValue());
+    mpf_init_set_d(arg_0, info[0]->NumberValue(context).FromJust());
     mpf_neg(sum, arg_0);
 
     double result = mpf_get_d(sum);
@@ -159,3 +172,42 @@ NAN_METHOD(Gmp_Node::MPF_Neg) {
 
     RETURN_VALUE(info, Nan::New<v8::Number>(result));
 }
+
+void Init(v8::Local<v8::Object> exports) {
+    v8::Local<v8::Context> context = exports->CreationContext();
+
+    exports->Set(context,
+        Nan::New("mpf_add").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Add)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_sub").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Sub)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_mul").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Mul)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_div").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Div)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_sqrt").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Sqrt)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_pow_ui").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Pow_ui)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_neg").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Neg)->GetFunction(context).ToLocalChecked()
+    );
+    exports->Set(context,
+        Nan::New("mpf_abs").ToLocalChecked(),
+        Nan::New<v8::FunctionTemplate>(MPF_Abs)->GetFunction(context).ToLocalChecked()
+    );
+}
+
+NODE_MODULE(gmp_node_addon, Init);

@@ -31,3 +31,7 @@
 # Debug files
 *.dSYM/
 *.su
+
+.idea
+node_modules
+package-lock.json
